@@ -1,0 +1,276 @@
+#navbar {
+    color: red;
+    font-weight:bold;
+}
+
+
+/*
+
+#logo{
+  height: auto;
+  width: auto;
+  max-width: 100px;
+  max-height: 100px;
+}
+
+body{
+  background-color: black;
+  color: white;
+  font-family: 'Verdana';
+}
+
+body p{
+  font-size: 25px;
+
+}
+
+nav{
+  color: red;
+
+}
+
+nav ul li{
+  display: inline-block;
+  list-style: none;
+  margin: 10px 30px;
+}
+
+nav ul li a{
+  color: #ffff;
+  text-decoration: none;
+}
+
+nav{
+  padding-right: 100px;
+}
+
+nav:link{
+  color: white;
+  text-decoration: none;
+}
+nav:hover{
+  color:grey;
+}
+
+.bannermain::after{
+  content:'';
+  background:linear-gradient(
+    to bottom, transparent, black
+  ), url('intro.gif') no-repeat center center;
+  position: absolute;
+  background-size: cover;
+  top:0px;
+  left: 0px;
+  width:100%;
+  height:100%;
+  opacity: 0.3;
+  margin-top: 110px
+}
+
+.bannermain{
+  color: white;
+  text-align: left;
+  margin-left: 80px;
+  margin-top: 80px;
+  font-size: 40px;
+  padding-bottom: 350px
+}
+
+.bannertext{
+  display: inline-block;
+}
+
+.bannerhero:after{
+  content:'';
+  background:linear-gradient(
+    to bottom, transparent, black
+  ), url('showa_bg.jpg');
+  position: absolute;
+  background-size: cover;
+  top:0px;
+  left: 0px;
+  width:100%;
+  height:100%;
+  opacity: 0.3;
+  margin-top: 110px
+}
+
+.bannerhero{
+  color: white;
+  text-align: left;
+  margin-left: 80px;
+  margin-top: 80px;
+  font-size: 40px;
+  padding-bottom: 350px
+}
+
+.bannerpoll:after{
+  content:'';
+  background:linear-gradient(
+    to bottom, transparent, black
+  ), url('poll_banner.png');
+  position: absolute;
+  background-size: cover;
+  top:0px;
+  left: 0px;
+  width:100%;
+  height:100%;
+  opacity: 0.3;
+  margin-top: 110px
+}
+
+.bannerheisei{
+  color: white;
+  text-align: left;
+  margin-left: 80px;
+  margin-top: 80px;
+  font-size: 40px;
+  padding-bottom: 350px
+}
+
+.bannerheisei:after{
+  content:'';
+  background:linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 0) 50%,
+            rgba(0, 0, 0, 0) 51%,
+            rgba(0, 0, 0, 1) 100%
+        ), url('heisei_bg.jpg');
+  position: absolute;
+  background-size: cover;
+  top:0px;
+  left: 0px;
+  width:100%;
+  height:100%;
+  opacity: 0.3;
+  margin-top: 2400px;
+}
+
+.bannernewgen{
+  color: white;
+  text-align: left;
+  margin-left: 80px;
+  margin-top: 80px;
+  font-size: 40px;
+  padding-bottom: 350px
+}
+
+.bannernewgen:after{
+  content:'';
+  background:linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 0) 50%,
+            rgba(0, 0, 0, 0) 51%,
+            rgba(0, 0, 0, 1) 100%
+        ), url('newgen_bg.jpg');
+  position: absolute;
+  background-size: cover;
+  top:0px;
+  left: 0px;
+  width:100%;
+  height:100%;
+  opacity: 0.3;
+  margin-top: 5100px;
+}
+
+.bannerpoll{
+  color: white;
+  text-align: left;
+  margin-left: 80px;
+  margin-top: 80px;
+  font-size: 40px;
+  padding-bottom: 350px
+}
+
+#man_img{
+  float: right;
+  margin: 0 0 0 15px;
+  height: auto;
+  width: auto;
+  max-height: 500px;
+}
+
+a{
+  color: white
+}
+
+a:hover{
+  color:grey
+}
+
+table{
+  border-color: red;
+  width: auto;
+}
+
+td{
+  padding: 20px;
+  text-align: center;
+  width: auto;
+  height: auto;
+
+}
+
+.form_images{
+  height: auto;
+  width: auto;
+  max-height: 50px
+}
+
+.showa_poll{
+  padding: 50px;
+  border-style: solid;
+  border-color: red;
+  border-width: thick;
+  height: 500px;
+}
+
+.submit{
+  margin-top: 10px;
+  padding: 5px;
+  position: absolute;
+  float: right;
+}
+
+
+#showa_img{
+  margin-left: 300px
+}
+
+.radio_showa{
+  width: 350px;
+  float: left;
+}
+
+#selectedImage{
+  width: 200px;
+  height: 200px;
+  border-style: dashed;
+  border-color: grey;
+  float: left;
+}
+
+#chart{
+  margin-bottom: 50px;
+  width: 100%;
+  padding-left: 600px;
+}
+
+.hero_table img{
+  width:auto;
+  height: auto;
+  max-width: 150px;
+  max-height: 150px
+}
+
+.hero_table{
+  padding-left: 50px;
+  padding-right: 50px
+}
+
+iframe{
+  padding-left: 50px
+}
+*/
