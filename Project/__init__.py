@@ -49,7 +49,7 @@ def home():
 
 
 @app.route('/index')
-def hello_world():
+def index():
     return render_template('index.html')
 
 
