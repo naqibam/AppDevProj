@@ -48,11 +48,6 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/index')
-def index():
-    return render_template('index.html')
-
-
 # noinspection PyPep8Naming
 @app.route('/Cart')
 def Cart():
