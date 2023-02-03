@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}UNRIVALLED Location{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+  <head>
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>UNRIVALLED Location</h1>
+        <div id="map"></div>
+    <button id="currentLocation" class="btn btn-warning">Current Location</button>
+<table class="table table-striped">
+    <thead>
+      <tr>
+
+        <th>Address</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for location in location_list %}
+        <tr>
+
+          <td>{{ location.get_locationAddress() }}</td>
+<td>
+
+  <button type="button" id="go_{{ location.get_location_id() }}" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{location.get_location_id()}}">
+  Go
+</button></td>
+            {% endfor %}
+  </table>
+    <script>
+      var map;
+      var marker;
+      function initMap() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            map = new google.maps.Map(document.getElementById('map'), {
+              zoom: 15,
+              center: pos
+            });
+
+            marker = new google.maps.Marker({
+              position: pos,
+              map: map
+            });
+          }, function() {
+            handleLocationError(true, map.getCenter());
+          });
+        } else {
+          handleLocationError(false, map.getCenter());
+        }
+      }
+
+      function handleLocationError(browserHasGeolocation, pos) {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: pos
+        });
+
+        marker = new google.maps.Marker({
+          position: pos,
+          map: map
+        });
+      }
+
+      {% for location in location_list %}
+      document.getElementById('go_{{ location.get_location_id() }}').addEventListener('click', function() {
+        map.setCenter({lat: {{ location.get_lat() }}, lng: {{ location.get_lng() }}});
+        marker.setPosition({lat: {{ location.get_lat() }}, lng: {{ location.get_lng() }}});
+      });
+      {% endfor %}
+
+      document.getElementById('currentLocation').addEventListener('click', function() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            map.setCenter(pos);
+            marker.setPosition(pos);
+          });
+        }
+      });
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpM2kp1CP9z6QGg42jKOd2Q0QM6mMVVRU&callback=initMap">
+    </script>
+  </body>
+{% endblock %}
