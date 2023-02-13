@@ -214,6 +214,14 @@ def credit_card_form():
         except:
             print("Error in retrieving credit card from credit_card_db.db.")
 
+        for key in creditcard_dict:
+            creditcard = creditcard_dict.get(key)
+            if creditcard.get_cardnumber() == ccform.cardnumber.data:
+                flash("Card Number already exists")
+                db.close()
+                return render_template('creditCardForm.html', form=ccform)
+
+
         creditcard = CreditCardClass.CreditCard(ccform.cardholder.data, ccform.cardnumber.data,
                                                 ccform.exp_month.data, ccform.exp_year.data,
                                                 ccform.verification.data)
@@ -226,17 +234,16 @@ def credit_card_form():
         return redirect(url_for('get_card_route'))
     return render_template('creditCardForm.html', form=ccform)
 
-
 # Retrieve the credit card information
 @app.route('/get_card')
 def get_card_route():
-    # create database
+# create database
     creditcard_dict = {}
     db = shelve.open('credit_card_db.db', 'r')
     creditcard_dict = db['CreditCard']
     db.close()
 
-    # insert the data information into the shelves you have created
+# insert the data information into the shelves you have created
     creditcard_list = []
     for key in creditcard_dict:
         creditcard = creditcard_dict.get(key)
@@ -244,15 +251,22 @@ def get_card_route():
 
     return render_template("retrieveCreditCard.html", count=len(creditcard_list), creditcard_list=creditcard_list)
 
-
+# update credit card
 @app.route('/update_card/<int:id>', methods=["GET", "POST"])
 def update_card_route(id):
     update_creditcard_form = CreditCardForm(request.form)
-    # update the database
+# update the database
     if request.method == 'POST' and update_creditcard_form.validate():
         creditcard_dict = {}
         db = shelve.open('credit_card_db.db', 'w')
         creditcard_dict = db['CreditCard']
+
+        for key in creditcard_dict:
+            creditcard = creditcard_dict.get(key)
+            if creditcard.get_cardnumber() == update_creditcard_form.cardnumber.data:
+                flash("Card Number already exists")
+                db.close()
+                return render_template('updateCreditCard.html', form=update_creditcard_form)
 
         creditcard = creditcard_dict.get(id)
         creditcard.set_cardholder(update_creditcard_form.cardholder.data)
@@ -278,8 +292,8 @@ def update_card_route(id):
         update_creditcard_form.exp_year.data = creditcard.get_exp_year()
         update_creditcard_form.verification.data = creditcard.get_verification_code()
 
-        return render_template("updateCreditCard.html", form=update_creditcard_form)
 
+        return render_template("updateCreditCard.html", form=update_creditcard_form)
 
 # delete credit card
 @app.route('/deleteCreditCard/<int:id>', methods=['POST'])
@@ -293,7 +307,6 @@ def delete_credit_card(id):
     db.close()
 
     return redirect(url_for('get_card_route'))
-
 
 @app.route('/gymlocations')
 def location_page():
@@ -309,9 +322,7 @@ def location_page():
         lng = location.get_lng()
         locations.append({'lat': lat, 'lng': lng})
 
-    return render_template('location.html', locations=locations, count=len(locations),
-                           location_list=location_dict.values())
-
+    return render_template('location.html', locations=locations, count=len(locations), location_list=location_dict.values())
 
 @app.route('/createlocations', methods=['GET', 'POST'])
 def create_location_page():
@@ -325,8 +336,18 @@ def create_location_page():
         except:
             print("Error in retrieving GymLocation from location.db.")
 
-        location = LocationClass.GymLocation(create_location_form.locationAddress.data, create_location_form.lat.data,
-                                             create_location_form.lng.data)
+        for key in location_dict:
+            location = location_dict.get(key)
+            if location.get_locationAddress() == create_location_form.locationAddress.data:
+                flash("Address already exists")
+                db.close()
+                return render_template('createLocation.html', form=create_location_form)
+            elif location.get_lat() == create_location_form.lat.data and location.get_lng() == create_location_form.lng.data:
+                flash("Address and lat and long already exists")
+                db.close()
+                return render_template('createLocation.html', form=create_location_form)
+
+        location = LocationClass.GymLocation(create_location_form.locationAddress.data, create_location_form.lat.data, create_location_form.lng.data)
         location_dict[location.get_location_id()] = location
         db['GymLocation'] = location_dict
 
@@ -334,7 +355,6 @@ def create_location_page():
 
         return redirect(url_for('retrieve_location'))
     return render_template('createLocation.html', form=create_location_form)
-
 
 @app.route('/retrievelocation')
 def retrieve_location():
@@ -350,7 +370,6 @@ def retrieve_location():
 
     return render_template('retrieveMapLocation.html', count=len(location_list), location_list=location_list)
 
-
 @app.route('/updatelocation/<int:id>/', methods=['GET', 'POST'])
 def update_location(id):
     update_location_form = GymLocationForm(request.form)
@@ -358,6 +377,18 @@ def update_location(id):
         location_dict = {}
         db = shelve.open('location.db', 'w')
         location_dict = db['GymLocation']
+
+
+        for key in location_dict:
+            location = location_dict.get(key)
+            if location.get_locationAddress() == update_location_form.locationAddress.data:
+                flash("Address already exists")
+                db.close()
+                return render_template('updateMapLocation.html', form=update_location_form)
+            elif location.get_lat() == update_location_form.lat.data and location.get_lng() == update_location_form.lng.data:
+                flash("Address and lat and long already exists")
+                db.close()
+                return render_template('UpdateMapLocation.html', form=update_location_form)
 
         location = location_dict.get(id)
         location.set_locationAddress(update_location_form.locationAddress.data)
@@ -379,7 +410,7 @@ def update_location(id):
         update_location_form.lat.data = location.get_lat()
         update_location_form.lng.data = location.get_lng()
 
-        return render_template('updateMapLocation.html', form=update_location_form)
+        return  render_template('updateMapLocation.html', form=update_location_form)
 
 
 @app.route('/deletelocation/<int:id>', methods=['POST'])

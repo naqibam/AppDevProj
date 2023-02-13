@@ -62,10 +62,9 @@ class InventoryEdit(FlaskForm):
 class CreditCardForm(Form):
     cardholder = StringField('Name (on card)', [validators.Length(min=1, max=150), validators.DataRequired()])
     cardnumber = IntegerField('Card Number', [validators.NumberRange(min=1000000000000000, max=9999999999999999), validators.DataRequired()])
-    exp_month = IntegerField('Month / Year in (MM/YYYY)', [validators.NumberRange(min=1, max=12), validators.DataRequired()])
-    exp_year = IntegerField('', [validators.NumberRange(min=2023, max=2100), validators.DataRequired()])
+    exp_month = IntegerField('Month in (MM)', [validators.NumberRange(min=1, max=12), validators.DataRequired()])
+    exp_year = IntegerField('Year in (YYYY)', [validators.NumberRange(min=2023, max=2100), validators.DataRequired()])
     verification = IntegerField('CVV', [validators.NumberRange(min=100, max=999), validators.DataRequired()])
-
 
 class GymLocationForm(Form):
     locationAddress = StringField('Location Name', validators=[DataRequired()])
