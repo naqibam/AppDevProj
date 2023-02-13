@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired
 
 
 def nric_check(form, field):
-    if field.data[0].isalpha() is False or field.data[1:8].isnumeric() is False or field.data[-1].isalpha() is False:
+    if field.data[0].isalpha()is False or field.data[1:8].isnumeric() is False or field.data[-1].isalpha() is False:
         raise ValidationError('NRIC is invalid')
 
 
@@ -58,12 +58,14 @@ class InventoryEdit(FlaskForm):
     price = StringField('Price', [validators.DataRequired()])
     quantity = IntegerField('Quantity', [validators.DataRequired()])
 
+
 class CreditCardForm(Form):
     cardholder = StringField('Name (on card)', [validators.Length(min=1, max=150), validators.DataRequired()])
     cardnumber = IntegerField('Card Number', [validators.NumberRange(min=1000000000000000, max=9999999999999999), validators.DataRequired()])
     exp_month = IntegerField('Month / Year in (MM/YYYY)', [validators.NumberRange(min=1, max=12), validators.DataRequired()])
     exp_year = IntegerField('', [validators.NumberRange(min=2023, max=2100), validators.DataRequired()])
     verification = IntegerField('CVV', [validators.NumberRange(min=100, max=999), validators.DataRequired()])
+
 
 class GymLocationForm(Form):
     locationAddress = StringField('Location Name', validators=[DataRequired()])

@@ -17,6 +17,10 @@
   <div class="form-group">
     {{ render_field(form.lng, class="form-control") }}
   </div>
+    <p></p>
+          {% for message in get_flashed_messages() %}
+<div class="alert alert-danger">{{ message }}</div>
+{% endfor %}
   <input type="submit" value="Submit" class="btn btn-primary"/>
 </form>
 {% endblock %}
