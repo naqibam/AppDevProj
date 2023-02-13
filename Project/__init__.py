@@ -5,11 +5,13 @@ import shelve
 import os
 from flask_login import LoginManager, login_user, current_user
 from flask import Flask, render_template, request, redirect, url_for, flash
-from Forms import CreateEmployeeForm, RegisterAccountForm, Login, InventoryEdit
+from Forms import CreateEmployeeForm, RegisterAccountForm, Login, InventoryEdit, CreditCardForm, GymLocationForm
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import CreditCardClass, LocationClass
+
 
 login_manager = LoginManager()
 app = Flask(__name__)
@@ -205,6 +207,229 @@ def employee_list():
 
     return render_template('employee_list.html', count=len(employees_list), employees_list=employees_list, employee_count=employee_count)
 
+@app.route('/CreateCreditCard', methods=['GET', 'POST'])
+def credit_card_form():
+    ccform = CreditCardForm(request.form)
+    if request.method == 'POST' and ccform.validate():
+        creditcard_dict = {}
+        db = shelve.open('credit_card_db.db', 'c')
+
+        try:
+            creditcard_dict = db['CreditCard']
+        except:
+            print("Error in retrieving credit card from credit_card_db.db.")
+
+        for key in creditcard_dict:
+            creditcard = creditcard_dict.get(key)
+            if creditcard.get_cardnumber() == ccform.cardnumber.data:
+                flash("Card Number already exists")
+                db.close()
+                return render_template('creditCardForm.html', form=ccform)
+
+
+        creditcard = CreditCardClass.CreditCard(ccform.cardholder.data, ccform.cardnumber.data,
+                                                ccform.exp_month.data, ccform.exp_year.data,
+                                                ccform.verification.data)
+
+        creditcard_dict[creditcard.get_creditcard_id()] = creditcard
+        db['CreditCard'] = creditcard_dict
+
+        db.close()
+        # replace get_card_route to the process of payment, once everything completes
+        return redirect(url_for('get_card_route'))
+    return render_template('creditCardForm.html', form=ccform)
+
+# Retrieve the credit card information
+@app.route('/get_card')
+def get_card_route():
+# create database
+    creditcard_dict = {}
+    db = shelve.open('credit_card_db.db', 'r')
+    creditcard_dict = db['CreditCard']
+    db.close()
+
+# insert the data information into the shelves you have created
+    creditcard_list = []
+    for key in creditcard_dict:
+        creditcard = creditcard_dict.get(key)
+        creditcard_list.append(creditcard)
+
+    return render_template("retrieveCreditCard.html", count=len(creditcard_list), creditcard_list=creditcard_list)
+
+# update credit card
+@app.route('/update_card/<int:id>', methods=["GET", "POST"])
+def update_card_route(id):
+    update_creditcard_form = CreditCardForm(request.form)
+# update the database
+    if request.method == 'POST' and update_creditcard_form.validate():
+        creditcard_dict = {}
+        db = shelve.open('credit_card_db.db', 'w')
+        creditcard_dict = db['CreditCard']
+
+        for key in creditcard_dict:
+            creditcard = creditcard_dict.get(key)
+            if creditcard.get_cardnumber() == update_creditcard_form.cardnumber.data:
+                flash("Card Number already exists")
+                db.close()
+                return render_template('updateCreditCard.html', form=update_creditcard_form)
+
+        creditcard = creditcard_dict.get(id)
+        creditcard.set_cardholder(update_creditcard_form.cardholder.data)
+        creditcard.set_cardnumber(update_creditcard_form.cardnumber.data)
+        creditcard.set_exp_month(update_creditcard_form.exp_month.data)
+        creditcard.set_exp_year(update_creditcard_form.exp_year.data)
+        creditcard.set_verification_code(update_creditcard_form.verification.data)
+
+        db['CreditCard'] = creditcard_dict
+        db.close()
+
+        return redirect(url_for("get_card_route"))
+    else:
+        creditcard_dict = {}
+        db = shelve.open('credit_card_db.db', 'r')
+        creditcard_dict = db['CreditCard']
+        db.close()
+
+        creditcard = creditcard_dict.get(id)
+        update_creditcard_form.cardholder.data = creditcard.get_cardholder()
+        update_creditcard_form.cardnumber.data = creditcard.get_cardnumber()
+        update_creditcard_form.exp_month.data = creditcard.get_exp_month()
+        update_creditcard_form.exp_year.data = creditcard.get_exp_year()
+        update_creditcard_form.verification.data = creditcard.get_verification_code()
+
+
+        return render_template("updateCreditCard.html", form=update_creditcard_form)
+
+# delete credit card
+@app.route('/deleteCreditCard/<int:id>', methods=['POST'])
+def delete_credit_card(id):
+    creditcard_dict = {}
+    db = shelve.open('credit_card_db.db', 'w')
+    creditcard_dict = db['CreditCard']
+    creditcard_dict.pop(id)
+
+    db['CreditCard'] = creditcard_dict
+    db.close()
+
+    return redirect(url_for('get_card_route'))
+
+@app.route('/gymlocations')
+def location_page():
+    location_dict = {}
+    db = shelve.open('location.db', 'r')
+    location_dict = db['GymLocation']
+    db.close()
+
+    locations = []
+    for key in location_dict:
+        location = location_dict.get(key)
+        lat = location.get_lat()
+        lng = location.get_lng()
+        locations.append({'lat': lat, 'lng': lng})
+
+    return render_template('location.html', locations=locations, count=len(locations), location_list=location_dict.values())
+
+@app.route('/createlocations', methods=['GET', 'POST'])
+def create_location_page():
+    create_location_form = GymLocationForm(request.form)
+    if request.method == 'POST' and create_location_form.validate():
+        location_dict = {}
+        db = shelve.open('location.db', 'c')
+
+        try:
+            location_dict = db['GymLocation']
+        except:
+            print("Error in retrieving GymLocation from location.db.")
+
+        for key in location_dict:
+            location = location_dict.get(key)
+            if location.get_locationAddress() == create_location_form.locationAddress.data:
+                flash("Address already exists")
+                db.close()
+                return render_template('createLocation.html', form=create_location_form)
+            elif location.get_lat() == create_location_form.lat.data and location.get_lng() == create_location_form.lng.data:
+                flash("Address and lat and long already exists")
+                db.close()
+                return render_template('createLocation.html', form=create_location_form)
+
+        location = LocationClass.GymLocation(create_location_form.locationAddress.data, create_location_form.lat.data, create_location_form.lng.data)
+        location_dict[location.get_location_id()] = location
+        db['GymLocation'] = location_dict
+
+        db.close()
+
+        return redirect(url_for('retrieve_location'))
+    return render_template('createLocation.html', form=create_location_form)
+
+@app.route('/retrievelocation')
+def retrieve_location():
+    location_dict = {}
+    db = shelve.open('location.db', 'r')
+    location_dict = db['GymLocation']
+    db.close()
+
+    location_list = []
+    for key in location_dict:
+        location = location_dict.get(key)
+        location_list.append(location)
+
+    return render_template('retrieveMapLocation.html', count=len(location_list), location_list=location_list)
+
+@app.route('/updatelocation/<int:id>/', methods=['GET', 'POST'])
+def update_location(id):
+    update_location_form = GymLocationForm(request.form)
+    if request.method == 'POST' and update_location_form.validate():
+        location_dict = {}
+        db = shelve.open('location.db', 'w')
+        location_dict = db['GymLocation']
+
+
+        for key in location_dict:
+            location = location_dict.get(key)
+            if location.get_locationAddress() == update_location_form.locationAddress.data:
+                flash("Address already exists")
+                db.close()
+                return render_template('updateMapLocation.html', form=update_location_form)
+            elif location.get_lat() == update_location_form.lat.data and location.get_lng() == update_location_form.lng.data:
+                flash("Address and lat and long already exists")
+                db.close()
+                return render_template('UpdateMapLocation.html', form=update_location_form)
+
+        location = location_dict.get(id)
+        location.set_locationAddress(update_location_form.locationAddress.data)
+        location.set_lat(update_location_form.lat.data)
+        location.set_lng(update_location_form.lng.data)
+
+        db['GymLocation'] = location_dict
+        db.close()
+
+        return redirect(url_for('retrieve_location'))
+    else:
+        location_dict = {}
+        db = shelve.open('location.db', 'r')
+        location_dict = db['GymLocation']
+        db.close()
+
+        location = location_dict.get(id)
+        update_location_form.locationAddress.data = location.get_locationAddress()
+        update_location_form.lat.data = location.get_lat()
+        update_location_form.lng.data = location.get_lng()
+
+        return  render_template('updateMapLocation.html', form=update_location_form)
+
+
+@app.route('/deletelocation/<int:id>', methods=['POST'])
+def delete_location(id):
+    location_dict = {}
+    db = shelve.open('location.db', 'w')
+    location_dict = db['GymLocation']
+
+    location_dict.pop(id)
+
+    db['GymLocation'] = location_dict
+    db.close()
+
+    return redirect(url_for('retrieve_location'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
