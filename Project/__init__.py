@@ -1,3 +1,4 @@
+import uuid
 import Employee, Account, Inventory, CreditCardClass, LocationClass
 import shelve
 import os
@@ -10,6 +11,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from feedback import ContactUs
 from feedbackinput import Contact
+from uuid import UUID
 
 login_manager = LoginManager()
 app = Flask(__name__)
@@ -72,10 +74,10 @@ def create_feedback():
 
         db.close()
 
-    return redirect(url_for('retrieve_feedbacks'))
-    # return render_template('feedbackform.html', form=feedback_form)
+        return redirect(url_for('retrieve_feedbacks'))
+    return render_template('feedbackform.html', form=feedback_form)
 
-@app.route('/retrieveFeedback', methods=['GET', 'POST'])
+@app.route('/retrieveFeedback')
 def retrieve_feedbacks():
     feedback_dict = {}
     db = shelve.open('storage.db', 'r')
@@ -89,38 +91,62 @@ def retrieve_feedbacks():
         messages = feedback_dict.get(key)
         feed_list.append(messages)
 
-    return render_template('adminFeedback.html', count=len(feed_list), feed_list=feedback_dict)
+    return render_template('adminFeedback.html', count=len(feed_list), feed_list=feed_list)
 
-# @app.route('/deleteFeedback/<string:id>', methods=['POST'])
-# def delete_feedback_admin(id):
-#     feedback_dict = {}
-#     db = shelve.open('storage.db', 'w')
-#     feedback_dict = db['feedbacks']
 
-#     feed = feedback_dict.pop(UUID(id))
-
-#     db['feedbacks'] = feedback_dict
-#     db.close()
-
-#     return redirect(url_for('retrieve_feedback_admin'))
-@app.route('/deleteFeed/<int:id>', methods=['POST'])
+@app.route('/deleteFeed/<string:id>', methods=['POST'])
 def delete_feed(id):
     feedback_dict = {}
     db = shelve.open('storage.db', 'w')
     feedback_dict = db['feedbacks']
 
-    feedback_dict.pop(uuid(id))
+    feedback_dict.pop(UUID(id))
 
     db['feedbacks'] = feedback_dict
     db.close()
-
-    feed_list = []
-    for key in feedback_dict:
-        messages = feedback_dict.get(key)
-        feed_list.append(messages)
+    return redirect(url_for('retrieve_feedbacks'))
 
 
-    return render_template('retrieveFeedback.html', count=len(feed_list), feed_list=feedback_dict)
+@app.route('/updateFeedback/<string:id>/', methods=['GET', 'POST'])
+def update_feedback(id):
+    update_feed_form = ContactUs(request.form)
+
+    if request.method == 'POST' and update_feed_form.validate():
+        feedback_dict = {}
+        db = shelve.open('storage.db', 'w')
+        feedback_dict = db['feedbacks']
+
+        feed = feedback_dict.get(UUID(id))
+        feed.set_name(update_feed_form.name.data)
+        feed.set_email(update_feed_form.email.data)
+        feed.set_feedback(update_feed_form.feedback.data)
+
+        db['feedbacks'] = feedback_dict
+        db.close()
+        return redirect(url_for("retrieve_feedbacks"))
+
+    else:
+        feedback_dict = {}
+        db = shelve.open('storage.db', 'r')
+        feedback_dict = db['feedbacks']
+        db.close()
+
+        feed = feedback_dict.get(UUID(id))
+        update_feed_form.name.data = feed.get_name()
+        update_feed_form.email.data = feed.get_email()
+        update_feed_form.feedback.data = feed.get_feedback()
+       
+
+        return render_template("updatefeedback.html", form=update_feed_form)
+
+
+        
+
+@app.route('/deleteUser/<string:id>', methods=['POST'])
+def admin_delete_user(id):
+    User().del_user(id)
+
+    return redirect(url_for('admin'))
 
 # noinspection PyPep8Naming
 @app.route('/Cart')

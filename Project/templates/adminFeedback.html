@@ -27,20 +27,45 @@
     <tbody>
          {% for i in feed_list %}
       <tr>
-        <td style="color: white;">{{ feed_list[i].get_contact_id() }}</td>
-        <td style="color: white;">{{ feed_list[i].get_name() }}</td>
-        <td style="color: white;">{{ feed_list[i].get_email() }}</td>
-        <td style="color: white;">{{ feed_list[i].get_feedback() }}</td>
+        <td style="color: white;">{{ i.get_contact_id() }}</td>
+        <td style="color: white;">{{ i.get_name() }}</td>
+        <td style="color: white;">{{ i.get_email() }}</td>
+        <td style="color: white;">{{ i.get_feedback() }}</td>
 
-        <td><a href="#" class="btn btn-warning">Update</a></td>
+        <td><a href="/updateFeedback/{{i.get_contact_id()}}" class="btn btn-warning">Update</a></td>
         <td>
-            <form action="{{url_for('delete_feed', id=feed_list[i].get_contact_id())}}" method="POST">
-              <!-- Button to Open the Modal -->
-              <button type="button" class="btn btn-danger" data-toggle="modal" id="delete">
-                  Delete <i class="fas fa-trash-alt"></i>
-              </button>
-
-              <!-- The Modal -->
+            <form action="{{url_for('delete_feed', id=i.get_contact_id())}}" method="POST">
+    
+                <!-- Button to Open the Modal -->
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{i.get_contact_id()}}">
+                  Delete
+                </button>
+                
+                <!-- The Modal -->
+                <div class="modal" id="myModal_{{i.get_contact_id()}}">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                
+                      <!-- Modal Header -->
+                      <div class="modal-header">
+                        <h4 class="modal-title">Delete Confirmation</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                
+                      <!-- Modal body -->
+                      <div class="modal-body">
+                        Are you sure you want to delete ?
+                      </div>
+                
+                      <!-- Modal footer -->
+                      <div class="modal-footer">
+                        <input type="submit" value="Delete" class="btn btn-danger">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      </div>
+                
+                    </div>
+                  </div>
+                </div>
               
       </form>
 
