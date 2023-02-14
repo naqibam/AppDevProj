@@ -5,12 +5,12 @@ import shelve
 import os
 from flask_login import LoginManager, login_user, current_user
 from flask import Flask, render_template, request, redirect, url_for, flash
-from Forms import CreateEmployeeForm, RegisterAccountForm, Login, InventoryEdit, CreditCardForm, GymLocationForm
+from Forms import CreateEmployeeForm, RegisterAccountForm, Login, InventoryEdit, CreditCardForm, GymLocationForm, BookingForm
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-import CreditCardClass, LocationClass
+import CreditCardClass, LocationClass, BookingCustomerClass
 
 
 login_manager = LoginManager()
@@ -430,6 +430,143 @@ def delete_location(id):
     db.close()
 
     return redirect(url_for('retrieve_location'))
+
+@app.route('/bookingmap')
+def booking_map():
+    location_dict = {}
+    db = shelve.open('location.db', 'r')
+    location_dict = db['GymLocation']
+    db.close()
+
+    locations = []
+    for key in location_dict:
+        location = location_dict.get(key)
+        lat = location.get_lat()
+        lng = location.get_lng()
+        locations.append({'lat': lat, 'lng': lng})
+
+    return render_template('bookingMapPage.html', locations=locations, count=len(locations),
+                           location_list=location_dict.values())
+
+
+@app.route('/bookingform', methods=['GET', 'POST'])
+def bookingform():
+    location_address = request.args.get('location_address')
+    lat = request.args.get('lat')
+    lng = request.args.get('lng')
+    location = {'lat': lat, 'lng': lng}
+    booking_form = BookingForm(request.form)
+    if request.method == 'POST' and booking_form.validate():
+        booking_dict = {}
+        db = shelve.open('booking.db', 'c')
+
+        try:
+            booking_dict = db['Booking']
+        except:
+            print("Error in retrieving booking from booking.db.")
+
+        for key in booking_dict:
+            booking = booking_dict.get(key)
+            if booking.get_time() == booking_form.time.data and booking.get_date() == booking_form.date.data and location_address:
+                flash("Fully booked, no slot!")
+                db.close()
+                return render_template('bookingForm.html', form=booking_form)
+
+        booking = BookingCustomerClass.BookingCustomer(booking_form.name.data, booking_form.phone_number.data,
+                                                       booking_form.email.data, booking_form.date.data,
+                                                       booking_form.time.data, location_address, lat, lng)
+        # booking_dict[len(booking_dict) + 1] = booking
+        booking_dict[booking.get_booking_id()] = booking
+        db['Booking'] = booking_dict
+
+        db.close()
+
+        return redirect(url_for('retrieve_booking'))
+    return render_template('bookingForm.html', form=booking_form, location_address=location_address, location=location)
+
+@app.route('/retrievebooking')
+def retrieve_booking():
+    booking_dict = {}
+    db = shelve.open('booking.db', 'c')
+    booking_dict = db['Booking']
+    db.close()
+
+    booking_list = []
+    for key in booking_dict:
+        booking = booking_dict.get(key)
+        booking_list.append(booking)
+
+    return render_template('retrieveBooking.html', count=len(booking_list), booking_list=booking_list)
+
+
+@app.route('/updatebooking/<int:id>/', methods=['GET', 'POST'])
+def update_booking(id):
+    update_booking_form = BookingForm(request.form)
+    location_address_choices = [(location_address, location_address) for location_address in get_location_addresses()]
+    update_booking_form.location_address.choices = location_address_choices
+    if request.method == 'POST' and update_booking_form.validate():
+        booking_dict = {}
+        db = shelve.open('booking.db', 'w')
+        booking_dict = db['Booking']
+
+        booking = booking_dict.get(id)
+
+        if (booking.get_date() != update_booking_form.date.data or booking.get_time() != update_booking_form.time.data) and booking.get_location_address() in location_address_choices:
+            for key, value in booking_dict.items():
+                if value.get_date() == update_booking_form.date.data and value.get_time() == update_booking_form.time.data and value.get_location_address() == update_booking_form.location_address.data:
+                    flash("The slot has been taken up by someone")
+                    db.close()
+                    return render_template('UpdateBooking.html', form=update_booking_form)
+
+        booking.set_name(update_booking_form.name.data)
+        booking.set_phone_number(update_booking_form.phone_number.data)
+        booking.set_email(update_booking_form.email.data)
+        booking.set_date(update_booking_form.date.data)
+        booking.set_time(update_booking_form.time.data)
+        booking.set_location_address(update_booking_form.location_address.data)
+
+        db['Booking'] = booking_dict
+        db.close()
+
+        return redirect(url_for('retrieve_booking'))
+    else:
+        booking_dict = {}
+        db = shelve.open('booking.db', 'c')
+        booking_dict = db['Booking']
+        db.close()
+
+        booking = booking_dict.get(id)
+        update_booking_form.name.data = booking.get_name()
+        update_booking_form.phone_number.data = booking.get_phone_number()
+        update_booking_form.email.data = booking.get_email()
+        update_booking_form.date.data = booking.get_date()
+        update_booking_form.time.data = booking.get_time()
+        update_booking_form.location_address.data = booking.get_location_address()
+
+        return render_template('updateBooking.html', form=update_booking_form)
+
+def get_location_addresses():
+    location_address_dict = {}
+    db = shelve.open('location_address.db', 'c')
+    location_address_dict = db['LocationAddress']
+    db.close()
+
+    return [location_address for location_address in location_address_dict.values()]
+
+
+@app.route('/deleteBooking/<int:id>', methods=['POST'])
+def delete_booking(id):
+    booking_dict = {}
+    db = shelve.open('booking.db', 'w')
+    booking_dict = db['Booking']
+
+    booking_dict.pop(id)
+
+    db['Booking'] = booking_dict
+    db.close()
+
+    return redirect(url_for('retrieve_booking'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

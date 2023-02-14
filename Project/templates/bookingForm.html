@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Booking Form{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<head>
+    <title>Booking Form</title>
+</head>
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+    </style>
+<h1>Booking Form</h1>
+<div id="map"></div>
+{% if location_address %}
+  <p><h4>Location Address:</h4> {{ location_address }}</p>
+{% endif %}
+  <form method="POST" action="">
+ <div class="form-group">
+    {{ render_field(form.name, class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.phone_number, class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.email, class="form-control") }}
+  </div>
+      <div class="form-group">
+    {{ render_field(form.date, class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.time, class="form-control") }}
+  </div>
+                {% for message in get_flashed_messages() %}
+<div class="alert alert-danger">{{ message }}</div>
+{% endfor %}
+      <p></p>
+  <input type="submit" value="Submit" class="btn btn-primary"/>
+</form>
+<script>
+  function initMap() {
+    var location = {lat: {{ location.lat }}, lng: {{ location.lng }}};
+    var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 15,
+      center: location
+    });
+
+    var marker = new google.maps.Marker({
+      position: location,
+      map: map
+    });
+  }
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpM2kp1CP9z6QGg42jKOd2Q0QM6mMVVRU&callback=initMap">
+</script>
+{% endblock %}

@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c6836fa3-dfe8-42ab-afaa-3cb6dfa60d26" name="Changes" comment="">
+    <list default="true" id="c6836fa3-dfe8-42ab-afaa-3cb6dfa60d26" name="Changes" comment="Commit">
+      <change afterPath="$PROJECT_DIR$/BookingCustomerClass.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Project/templates/bookingForm.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Project/templates/bookingMapPage.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Project/templates/location.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Project/templates/retrieveBooking.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Project/templates/updateBooking.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Project/Forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project/Forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Project/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/templates/includes/_navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/Project/templates/includes/_navbar.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,6 +89,14 @@
       <option name="presentableId" value="Default" />
       <updated>1675387826154</updated>
     </task>
+    <task id="LOCAL-00001" summary="Commit">
+      <created>1676293161294</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1676293161294</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -96,5 +109,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit" />
   </component>
 </project>

@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import Form, StringField, SelectField, validators, ValidationError, PasswordField, SubmitField, \
-    BooleanField, IntegerField, FloatField
+    BooleanField, IntegerField, FloatField, DateField, TimeField
 from wtforms.validators import DataRequired
+from email_validator import validate_email, EmailNotValidError
 
 def nric_check(form, field):
     if field.data[0].isalpha() is False or field.data[1:8].isnumeric() is False or field.data[-1].isalpha() is False:
@@ -68,3 +69,21 @@ class GymLocationForm(Form):
     locationAddress = StringField('Location Name', validators=[DataRequired()])
     lat = FloatField('Latitude', validators=[DataRequired()])
     lng = FloatField('Longitude', validators=[DataRequired()])
+
+class BookingForm(Form):
+    name = StringField('Name: ', validators=[DataRequired()])
+    phone_number = IntegerField('Phone Number:', [validators.NumberRange(min=80000000, max=99999999), validators.DataRequired()])
+    email = StringField('Email: ', validators=[DataRequired()])
+    date = DateField('Date: ', format='%Y-%m-%d', validators=[DataRequired()])
+    time = TimeField('Time: ', validators=[DataRequired()])
+    location_address = SelectField('Location Address', choices=[])
+
+    def validate(self):
+        if not super().validate():
+            return False
+        try:
+            validate_email(self.email.data)
+        except EmailNotValidError as e:
+            self.email.errors.append(str(e))
+            return False
+        return True
