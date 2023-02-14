@@ -1,3 +1,4 @@
+import uuid
 import Employee, Account, Inventory, CreditCardClass, LocationClass
 import shelve
 import os
@@ -10,6 +11,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from feedback import ContactUs
 from feedbackinput import Contact
+from uuid import UUID
 
 login_manager = LoginManager()
 app = Flask(__name__)
@@ -72,10 +74,10 @@ def create_feedback():
 
         db.close()
 
-        # return redirect(url_for('retrieve_feedbacks'))
+        return redirect(url_for('retrieve_feedbacks'))
     return render_template('feedbackform.html', form=feedback_form)
 
-@app.route('/retrieveFeedback', methods=['GET', 'POST'])
+@app.route('/retrieveFeedback')
 def retrieve_feedbacks():
     feedback_dict = {}
     db = shelve.open('storage.db', 'r')
@@ -89,38 +91,20 @@ def retrieve_feedbacks():
         messages = feedback_dict.get(key)
         feed_list.append(messages)
 
-    return render_template('adminFeedback.html', count=len(feed_list), feed_list=feedback_dict)
+    return render_template('adminFeedback.html', count=len(feed_list), feed_list=feed_list)
 
-# @app.route('/deleteFeedback/<string:id>', methods=['POST'])
-# def delete_feedback_admin(id):
-#     feedback_dict = {}
-#     db = shelve.open('storage.db', 'w')
-#     feedback_dict = db['feedbacks']
 
-#     feed = feedback_dict.pop(UUID(id))
-
-#     db['feedbacks'] = feedback_dict
-#     db.close()
-
-#     return redirect(url_for('retrieve_feedback_admin'))
-@app.route('/deleteFeed/<int:id>', methods=['POST'])
+@app.route('/deleteFeed/<string:id>', methods=['POST'])
 def delete_feed(id):
     feedback_dict = {}
     db = shelve.open('storage.db', 'w')
     feedback_dict = db['feedbacks']
 
-    feedback_dict.pop(uuid(id))
+    feedback_dict.pop(UUID(id))
 
     db['feedbacks'] = feedback_dict
     db.close()
-
-    feed_list = []
-    for key in feedback_dict:
-        messages = feedback_dict.get(key)
-        feed_list.append(messages)
-
-
-    return render_template('retrieveFeedback.html', count=len(feed_list), feed_list=feedback_dict)
+    return redirect(url_for('retrieve_feedbacks'))
 
 # noinspection PyPep8Naming
 @app.route('/Cart')
