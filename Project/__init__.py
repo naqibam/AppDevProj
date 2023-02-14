@@ -72,8 +72,8 @@ def create_feedback():
 
         db.close()
 
-        # return redirect(url_for('retrieve_feedbacks'))
-    return render_template('feedbackform.html', form=feedback_form)
+    return redirect(url_for('retrieve_feedbacks'))
+    # return render_template('feedbackform.html', form=feedback_form)
 
 @app.route('/retrieveFeedback', methods=['GET', 'POST'])
 def retrieve_feedbacks():
