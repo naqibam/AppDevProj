@@ -6,7 +6,34 @@ from wtforms.validators import DataRequired
 
 
 def nric_check(form, field):
-    if field.data[0].isalpha()is False or field.data[1:8].isnumeric() is False or field.data[-1].isalpha() is False:
+    if field.data[0].isalpha() is False or field.data[1:8].isnumeric() is False or field.data[-1].isalpha() is False:
+        raise ValidationError('NRIC is invalid')
+    if len(field.data) != 9:
+        raise ValidationError('NRIC is invalid')
+    str = field.data.upper()
+    weight = 0
+    weight += int(field.data[1]) * 2
+    weight += int(field.data[2]) * 7
+    weight += int(field.data[3]) * 6
+    weight += int(field.data[4]) * 5
+    weight += int(field.data[5]) * 4
+    weight += int(field.data[6]) * 3
+    weight += int(field.data[7]) * 2
+
+    if str[0] == "T" or "G":
+        weight += 4
+
+    temp = weight % 11
+
+    st = ["J","Z","I","H","G","F","E","D","C","B","A"]
+    fg = ["X","W","U","T","R","Q","P","N","M","L","K"]
+    alpha = ""
+    if str[0] == "S" or "T":
+        alpha = st[temp]
+    elif str[0] == "F" or "T":
+        alpha = fg[temp]
+
+    if str[8] != alpha:
         raise ValidationError('NRIC is invalid')
 
 
@@ -65,6 +92,7 @@ class CreditCardForm(Form):
     exp_month = IntegerField('Month in (MM)', [validators.NumberRange(min=1, max=12), validators.DataRequired()])
     exp_year = IntegerField('Year in (YYYY)', [validators.NumberRange(min=2023, max=2100), validators.DataRequired()])
     verification = IntegerField('CVV', [validators.NumberRange(min=100, max=999), validators.DataRequired()])
+
 
 class GymLocationForm(Form):
     locationAddress = StringField('Location Name', validators=[DataRequired()])

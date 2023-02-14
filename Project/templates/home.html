@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+{% block title %}Library Loan System - Create User{% endblock %}
 
-        <!--=============== FAVICON ===============-->
-        <link rel="shortcut icon" href="template/assets/img/favicon.png" type="image/x-icon">
+{% block content %}
 
-        <!--=============== REMIXICON ===============-->
-        <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-        <!--=============== CSS ===============-->
-        <link rel="stylesheet" href="static/stylesheets/styles.css" />
-
-        <title>Responsive gym website - Bedimcode</title>
-    </head>
-    <body>
         <!--==================== HEADER ====================-->
         <header class="header" id="header">
-            <nav class="nav container">
+            <!--<nav class="nav container">
                 <a href="#" class="nav__logo">
                     <img src="static/img/unleashed png.png" alt="logo"> UNLEASHED
                 </a>
@@ -48,11 +35,11 @@
                     </div>
                 </div>
 
-                <!-- Toggle button -->
+                &lt;!&ndash; Toggle button &ndash;&gt;
                 <div class="nav__toggle" id="nav-toggle">
                     <i class="ri-menu-line"></i>
                 </div>
-            </nav>
+            </nav>-->
         </header>
 
         <!--==================== MAIN ====================-->
@@ -515,5 +502,4 @@
         
         <!--=============== MAIN JS ===============-->
         <script src="static/js/main.js"></script>
-    </body>
-</html>
+{% endblock %}

@@ -200,6 +200,19 @@ def employee_list():
     return render_template('employee_list.html', count=len(employees_list), employees_list=employees_list,
                            employee_count=employee_count)
 
+@app.route('/DeleteEmployee/<int:id>', methods=['POST'])
+def delete_employee(id):
+    employees_dict = {}
+    db = shelve.open('employee.db', 'w')
+    employees_dict = db['Employees']
+
+    employees_dict.pop(id)
+
+    db['Employees'] = employees_dict
+    db.close()
+
+    return redirect(url_for('retrieve_location'))
+
 
 
 @app.route('/CreateCreditCard', methods=['GET', 'POST'])
