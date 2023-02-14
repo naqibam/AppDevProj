@@ -68,9 +68,24 @@ input {
   font-size: var(--normal-font-size);
 }
 
+#reminder{
+color:black
+}
+
+#reminder1{color:black
+}
+
+th{
+ color:white
+}
+
+td{
+color:white
+}
+
 body {
   background-color: var(--body-color);
-  color: var(--text-color);
+  color: white
 }
 
 h1, h2, h3 {
