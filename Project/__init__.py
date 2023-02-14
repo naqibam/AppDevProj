@@ -8,6 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from feedback import ContactUs
+from feedbackinput import Contact
 
 login_manager = LoginManager()
 app = Flask(__name__)
@@ -40,11 +42,85 @@ with app.app_context():
 def load_user(user_id):
     return User.get(user_id)
 
-
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('basehome.html')
 
+
+@app.route('/feedback', methods=['GET', 'POST'])
+def create_feedback():
+    feedback_form = ContactUs(request.form)
+    if request.method == 'POST' and feedback_form.validate():
+        feedback_dict = {}
+        db = shelve.open('storage.db', 'c')
+
+        try:
+            feedback_dict = db['feedbacks']
+        except:
+            print("Error in retrieving Users from storage.db.")
+
+        feedbacks = Contact(feedback_form.name.data, feedback_form.email.data,
+                         feedback_form.feedback.data)
+        feedback_dict[feedbacks.get_contact_id()] = feedbacks
+        db['feedbacks'] = feedback_dict
+
+        # Test codes
+        # feedback_dict = db['feedbacks']
+        # feedbacks = feedback_dict[feedbacks.get_contact_id()]
+        # print(feedbacks.get_name(), feedbacks.get_email(), "was stored in storage.db successfully with user_id ==",
+        #       feedbacks.get_feedback())
+
+        db.close()
+
+        # return redirect(url_for('retrieve_feedbacks'))
+    return render_template('feedbackform.html', form=feedback_form)
+
+@app.route('/retrieveFeedback', methods=['GET', 'POST'])
+def retrieve_feedbacks():
+    feedback_dict = {}
+    db = shelve.open('storage.db', 'r')
+    feedback_dict = db['feedbacks']
+    print(feedback_dict)
+
+    db.close()
+
+    feed_list = []
+    for key in feedback_dict:
+        messages = feedback_dict.get(key)
+        feed_list.append(messages)
+
+    return render_template('adminFeedback.html', count=len(feed_list), feed_list=feedback_dict)
+
+# @app.route('/deleteFeedback/<string:id>', methods=['POST'])
+# def delete_feedback_admin(id):
+#     feedback_dict = {}
+#     db = shelve.open('storage.db', 'w')
+#     feedback_dict = db['feedbacks']
+
+#     feed = feedback_dict.pop(UUID(id))
+
+#     db['feedbacks'] = feedback_dict
+#     db.close()
+
+#     return redirect(url_for('retrieve_feedback_admin'))
+@app.route('/deleteFeed/<int:id>', methods=['POST'])
+def delete_feed(id):
+    feedback_dict = {}
+    db = shelve.open('storage.db', 'w')
+    feedback_dict = db['feedbacks']
+
+    feedback_dict.pop(uuid(id))
+
+    db['feedbacks'] = feedback_dict
+    db.close()
+
+    feed_list = []
+    for key in feedback_dict:
+        messages = feedback_dict.get(key)
+        feed_list.append(messages)
+
+
+    return render_template('retrieveFeedback.html', count=len(feed_list), feed_list=feedback_dict)
 
 # noinspection PyPep8Naming
 @app.route('/Cart')
@@ -438,6 +514,9 @@ def delete_location(id):
     db.close()
 
     return redirect(url_for('retrieve_location'))
+
+
+
 
 if __name__ == '__main__':
     app.run()
