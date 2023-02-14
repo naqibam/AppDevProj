@@ -106,6 +106,48 @@ def delete_feed(id):
     db.close()
     return redirect(url_for('retrieve_feedbacks'))
 
+
+@app.route('/updateFeedback/<string:id>/', methods=['GET', 'POST'])
+def update_feedback(id):
+    update_feed_form = ContactUs(request.form)
+
+    if request.method == 'POST' and update_feed_form.validate():
+        feedback_dict = {}
+        db = shelve.open('storage.db', 'w')
+        feedback_dict = db['feedbacks']
+
+        feed = feedback_dict.get(UUID(id))
+        feed.set_name(update_feed_form.name.data)
+        feed.set_email(update_feed_form.email.data)
+        feed.set_feedback(update_feed_form.feedback.data)
+
+        db['feedbacks'] = feedback_dict
+        db.close()
+        return redirect(url_for("retrieve_feedbacks"))
+
+    else:
+        feedback_dict = {}
+        db = shelve.open('storage.db', 'r')
+        feedback_dict = db['feedbacks']
+        db.close()
+
+        feed = feedback_dict.get(UUID(id))
+        update_feed_form.name.data = feed.get_name()
+        update_feed_form.email.data = feed.get_email()
+        update_feed_form.feedback.data = feed.get_feedback()
+       
+
+        return render_template("updatefeedback.html", form=update_feed_form)
+
+
+        
+
+@app.route('/deleteUser/<string:id>', methods=['POST'])
+def admin_delete_user(id):
+    User().del_user(id)
+
+    return redirect(url_for('admin'))
+
 # noinspection PyPep8Naming
 @app.route('/Cart')
 def Cart():

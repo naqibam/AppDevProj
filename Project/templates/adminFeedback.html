@@ -32,7 +32,7 @@
         <td style="color: white;">{{ i.get_email() }}</td>
         <td style="color: white;">{{ i.get_feedback() }}</td>
 
-        <td><a href="#" class="btn btn-warning">Update</a></td>
+        <td><a href="/updateFeedback/{{i.get_contact_id()}}" class="btn btn-warning">Update</a></td>
         <td>
             <form action="{{url_for('delete_feed', id=i.get_contact_id())}}" method="POST">
     
